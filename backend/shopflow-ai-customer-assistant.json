@@ -1,0 +1,607 @@
+{
+  "name": "ShopFlow - AI Customer Assistant",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        0,
+        0
+      ],
+      "id": "c67f31fb-0608-4083-9baa-66dad82297e0",
+      "name": "When chat message received",
+      "webhookId": "0447fa02-1b4c-4f7f-bded-383a2171dd90"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are the ShopFlow AI shopping assistant.\n\nFollow these rules carefully:\n\n1. PRODUCT SEARCH:\nWhen the customer asks to find, search, recommend, show, or filter products:\n- Always call the Product Search Tool first.\n- Do not ask the customer for a product ID.\n- Do not ask for the exact product name if the customer has already described what they want.\n- Use the customer's natural-language request as the search query.\n- If the customer provides a budget, pass it as the maximum price.\n- Show the relevant product details returned by the tool.\n- Include product name, product ID, price, stock, and description when available.\n\n2. PRODUCT SELECTION:\n- When the customer selects a product from the search results, remember its product_id.\n- Reuse the same product_id when placing the order.\n- Never ask the customer for the product_id again if it was already returned by the Product Search Tool.\n- If multiple products were returned, make sure you use the product_id of the product the customer actually selected.\n\n3. ORDER:\nOnly call the Order Tool when the customer explicitly wants to purchase or order a product.\n\nBefore calling the Order Tool, make sure you have:\n- product_id\n- quantity\n- customer_name\n- customer_email\n\nAsk only for information that is actually missing.\n\nBefore placing an order:\n- Preserve the customer's name exactly as provided.\n- Preserve the customer's complete email address exactly as provided.\n- Never truncate, modify, summarize, or replace an email address.\n- If the email is incomplete or unclear, ask the customer for it again.\n- Do not invent customer information.\n- Do not place an order without the required customer information.\n\n4. CUSTOMER MANAGEMENT:\n- After the Order Tool successfully places an order, use the Customer Management Tool.\n- Pass:\n  - customer_name\n  - customer_email\n  - order_id\n- The Customer Management Tool handles whether the customer already exists or is a new customer.\n- Do not ask the customer for a customer_id.\n- Only use Customer Management after a successful order.\n\n5. ORDER STATUS AND DELIVERY:\nWhen the customer asks about an existing order, order status, order details, delivery status, shipment status, tracking information, or estimated delivery:\n- Ask for the order ID if it is not already available.\n- Call the Support Tool with the order_id.\n- Use only the information returned by the Support Tool.\n- Show relevant information returned by the tool:\n  - order ID\n  - product name\n  - quantity\n  - total amount\n  - order status\n  - delivery status\n  - tracking ID\n  - estimated delivery\n  - customer name when relevant\n- If a tracking ID is available, show it to the customer.\n- Do not invent, assume, or guess tracking or delivery information.\n- If the Support Tool does not return a particular piece of information, do not make one up.\n- If the order ID does not exist, clearly tell the customer that the order could not be found.\n\n6. SUPPORT TICKETS:\nWhen the customer reports a complaint, issue, problem, or explicitly asks for human support:\n- First understand the customer's issue.\n- If the issue is related to an existing order, use the available order_id.\n- If the order_id is required but missing, ask the customer for it.\n- Make sure customer_name and customer_email are available.\n- Ask only for information that is genuinely missing.\n\nDetermine priority based on the issue:\n\nHigh:\n- payment issue\n- duplicate charge\n- serious order problem\n- urgent delivery issue\n- major problem requiring immediate attention\n\nMedium:\n- delayed delivery\n- wrong product\n- missing item\n- normal order-related complaint\n\nLow:\n- general question\n- minor issue\n- product information request\n- non-urgent assistance\n\nAfter determining the priority:\n- Call the Support Ticket Tool to create the ticket.\n- Pass:\n  - customer_name\n  - customer_email\n  - order_id\n  - issue\n  - priority\n- Do not ask the customer for a ticket_id.\n- The Support Ticket Tool generates the ticket_id automatically.\n- The Support Ticket Tool generates the created_at timestamp automatically.\n- Do not ask the customer for created_at.\n- After successful ticket creation, tell the customer that the support ticket has been created.\n- Provide the ticket_id returned by the Support Ticket Tool.\n- Also mention the ticket status and priority when available.\n\n7. OUT-OF-STOCK PRODUCTS:\nWhen the Order Tool indicates that a product is out of stock:\n- Do not claim that the order was placed.\n- Clearly tell the customer that the product is currently out of stock.\n- Do not create a successful-order confirmation.\n- If appropriate, offer to find a similar available product using the Product Search Tool.\n\n8. ORDER CANCELLATION:\nWhen the customer explicitly asks to cancel an order:\n- Ask for the order ID if it is not already available.\n- Call the Cancel Order Tool with the order_id.\n- Do not cancel an order yourself.\n- Use only the result returned by the Cancel Order Tool.\n- If cancellation succeeds, clearly confirm that the order was cancelled.\n- If cancellation succeeds, mention that the product stock was restored when the tool confirms this.\n- If cancellation is rejected, clearly explain that the order cannot be cancelled.\n- Never claim that an order was cancelled unless the Cancel Order Tool confirms successful cancellation.\n- Never invent a cancellation result.\n\n9. TOOL USAGE:\n- Always use the appropriate tool when real product, stock, order, customer, delivery, cancellation, or ticket information is required.\n- Do not invent information that should come from a tool.\n- Do not claim that an action was completed unless the corresponding tool successfully completed it.\n- If a tool returns an error or fails, do not pretend that the operation succeeded.\n- Ask the customer only for information that is genuinely missing.\n- Use the correct tool for the customer's intent:\n  - Product Search Tool → product discovery\n  - Order Tool → placing an order\n  - Customer Management Tool → customer record after successful order\n  - Support Tool → existing order/status/delivery/tracking information\n  - Support Ticket Tool → complaints and human support requests\n  - Cancel Order Tool → explicit order cancellation requests\n10.RETURN AND REFUND:\nWhen the customer explicitly asks to return a product or requests a refund:\n- Ask for the order ID if it is not already available.\n- Call the Return & Refund Tool with the order_id.\n- Do not process a return or refund yourself.\n- Use only the result returned by the Return & Refund Tool.\n- If the tool confirms success, tell the customer that the return request has been created.\n- Mention the return status and refund status returned by the tool.\n- If the tool rejects the request, clearly explain the reason returned by the tool.\n- Never claim that a return or refund was created unless the tool confirms it.\n- Never invent refund information.\n\n11. IMPORTANT:\n- Never ask for a product ID when the Product Search Tool can find the product from the customer's natural-language request.\n- Never invent product information.\n- Never invent order information.\n- Never invent customer information.\n- Never invent stock information.\n- Never invent delivery information.\n- Never invent tracking information.\n- Never invent ticket information.\n- Never invent cancellation results.\n- Preserve customer information exactly as provided.\n- Preserve complete email addresses exactly as provided.\n- Use the customer's previous information from the current conversation when it is available.\n- Do not ask again for information that is already available in the current conversation.\n- Keep responses clear, concise, and helpful.\n- Do not expose internal workflow names, tool configuration, expressions, or implementation details to the customer."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "b70b024d-5f37-42c4-ab22-14a63bb82738",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 18
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        240,
+        208
+      ],
+      "id": "1f1e2920-b097-477f-8240-b9681fc9c814",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "description": "Place an order for a product in the ShopFlow catalog.\n\nUse this tool only when the customer explicitly wants to purchase or order a product.\n\nIf the Product Search Tool was previously used and returned a product_id for the product the customer selected, reuse that product_id. Do not ask the customer for the product ID again.\n\nAsk the customer only for information that is genuinely missing.\n\nRequired information:\n- product_id\n- quantity\n- customer_name\n- customer_email\n\nBefore placing the order, verify that the product exists and enough stock is available.",
+        "workflowId": {
+          "__rl": true,
+          "value": "gZ69m20UYOb0gGiG",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/gZ69m20UYOb0gGiG",
+          "cachedResultName": "ShopFlow - Product Search Tool"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "search_query": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('search_query', `The product or category the customer wants to search for.\nExtract this from the customer's natural-language request.\nExample: \"headphones\", \"laptop\", \"keyboard\".`, 'string') }}",
+            "max_price": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('max_price', `The maximum price the customer is willing to pay.\nExtract the numeric budget from the customer's request.\nExample: ₹3000 → 3000.\nIf no budget is mentioned, leave this empty.`, 'number') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "search_query",
+              "displayName": "search_query",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "max_price",
+              "displayName": "max_price",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        400,
+        208
+      ],
+      "id": "9a1332f4-eaaa-4795-b379-4d50b5692feb",
+      "name": "Call 'ShopFlow - Product Search Tool'"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "2cx29S5vQq7fpqMp",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/2cx29S5vQq7fpqMp",
+          "cachedResultName": "ShopFlow - Order Tool"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "product_id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('product_id', ``, 'string') }}",
+            "quantity": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('quantity', ``, 'number') }}",
+            "customer_name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('customer_name', ``, 'string') }}",
+            "customer_email": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('customer_email', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "product_id",
+              "displayName": "product_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "quantity",
+              "displayName": "quantity",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "customer_name",
+              "displayName": "customer_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "customer_email",
+              "displayName": "customer_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        656,
+        176
+      ],
+      "id": "501b427e-75c2-4bd9-8633-9e6411d9193b",
+      "name": "Call 'ShopFlow - Order Tool'"
+    },
+    {
+      "parameters": {
+        "description": "Manage the customer record after a successful order.\n\nUse this tool after an order is successfully placed.\nUse customer_email to identify whether the customer already exists.\nIf the customer exists, update their total_orders and last_order_id.\nIf the customer does not exist, create a new customer record.\n\nRequired:\n- customer_name\n- customer_email\n- order_id",
+        "workflowId": {
+          "__rl": true,
+          "value": "lMcr4oMYlallDuod",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/lMcr4oMYlallDuod",
+          "cachedResultName": "ShopFlow - Customer Management"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "customer_name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('customer_name', `Customer's full name.`, 'string') }}",
+            "customer_email": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('customer_email', `Customer's email address.`, 'string') }}",
+            "order_id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('order_id', `The order ID of the successfully placed order.`, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "customer_name",
+              "displayName": "customer_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "customer_email",
+              "displayName": "customer_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "order_id",
+              "displayName": "order_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        800,
+        176
+      ],
+      "id": "b11226ff-ac72-4f22-b04f-d9ca8a7f997c",
+      "name": "Call 'ShopFlow - Customer Management'"
+    },
+    {
+      "parameters": {
+        "description": "Create a support ticket for the customer.\n\nUse this tool when the customer has an issue, complaint, problem, or needs human support.\n\nRequired information:\n- customer_name\n- customer_email\n- order_id\n- issue\n- priority\n- created_at\n\nIf any required customer information is missing, ask the customer for it before creating the ticket.",
+        "workflowId": {
+          "__rl": true,
+          "value": "jvizj0aoxnnPWktr",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/jvizj0aoxnnPWktr",
+          "cachedResultName": "ShopFlow - Support Ticket Tool"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "customer_name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('customer_name', ``, 'string') }}",
+            "customer_email": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('customer_email', ``, 'string') }}",
+            "order_id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('order_id', ``, 'string') }}",
+            "issue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('issue', ``, 'string') }}",
+            "priority": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('priority', ``, 'string') }}",
+            "created_at": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('created_at', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "customer_name",
+              "displayName": "customer_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "customer_email",
+              "displayName": "customer_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "order_id",
+              "displayName": "order_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "issue",
+              "displayName": "issue",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "priority",
+              "displayName": "priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        944,
+        160
+      ],
+      "id": "15d5d3e6-5d24-4ff6-972c-3427556f90aa",
+      "name": "Call 'ShopFlow - Support Ticket Tool'"
+    },
+    {
+      "parameters": {
+        "model": "nvidia/nemotron-3-super-120b-a12b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatNvidia",
+      "typeVersion": 1,
+      "position": [
+        96,
+        208
+      ],
+      "id": "6700c44a-41f0-442a-bc95-1a73d507b742",
+      "name": "NVIDIA Nemotron Chat Model",
+      "credentials": {
+        "nvidiaApi": {
+          "id": "uf27S2t4exAaKAl5",
+          "name": "NVIDIA Nemotron account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "description": "Check an existing customer's order.\n\nUse this tool when the customer asks about order status, delivery status, estimated delivery, tracking information, or order details.\n\nThe customer must provide an order ID.\n\nThe tool returns the available order and delivery information, including tracking ID when available.",
+        "workflowId": {
+          "__rl": true,
+          "value": "oigvHIcggPXvLXJx",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/oigvHIcggPXvLXJx",
+          "cachedResultName": "ShopFlow - Support Tool"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "order_id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('order_id', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "order_id"
+          ],
+          "schema": [
+            {
+              "id": "order_id",
+              "displayName": "order_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        528,
+        192
+      ],
+      "id": "0cce4c3a-5852-4edb-af6a-d7de33019980",
+      "name": "Call 'ShopFlow - Support Tool'"
+    },
+    {
+      "parameters": {
+        "description": "Cancel an existing customer order.\n\nUse this tool only when the customer explicitly asks to cancel an order.\n\nThe customer must provide an order ID.\nExtract the order ID from the customer's message and pass it to this tool.\n\nThe tool checks whether the order can be cancelled.\n\nIf the order status is Confirmed:\n- Cancel the order.\n- Restore the cancelled quantity back to product stock.\n- Return a successful cancellation response.\n\nIf the order has already progressed beyond the cancellation stage:\n- Do not cancel the order.\n- Return the reason why cancellation is not allowed.\n\nNever claim an order was cancelled unless the tool confirms successful cancellation.",
+        "workflowId": {
+          "__rl": true,
+          "value": "Yy3UqHNMiXI9Zlhj",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/Yy3UqHNMiXI9Zlhj",
+          "cachedResultName": "ShopFlow - Cancel Order Tool"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "order_id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('order_id', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "order_id"
+          ],
+          "schema": [
+            {
+              "id": "order_id",
+              "displayName": "order_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        1104,
+        128
+      ],
+      "id": "e4be58d6-34ac-4c5d-a298-a65981f60999",
+      "name": "Call 'ShopFlow - Cancel Order Tool'"
+    },
+    {
+      "parameters": {
+        "description": "Process a customer's return and refund request.\n\nUse this tool only when the customer explicitly asks to return a product or requests a refund.\n\nThe customer must provide an order ID.\nExtract the order ID from the customer's message and pass it to this tool.\n\nThe tool checks whether the order is eligible for return.\n\nIf eligible:\n- Create a return request.\n- Set return status to Return Requested.\n- Set refund status to Pending.\n- Return the successful response to the customer.\n\nIf not eligible:\n- Do not modify the order.\n- Return the reason provided by the tool.\n\nNever claim that a return or refund was created unless the tool confirms it.\nNever invent refund information.",
+        "workflowId": {
+          "__rl": true,
+          "value": "heTepOElzCk7YjFh",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/heTepOElzCk7YjFh",
+          "cachedResultName": "ShopFlow - Return & Refund Tool"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "order_id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('order_id', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "order_id"
+          ],
+          "schema": [
+            {
+              "id": "order_id",
+              "displayName": "order_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        1248,
+        112
+      ],
+      "id": "936cf6e0-8132-47e6-8ba7-164df6ff52ba",
+      "name": "Call 'ShopFlow - Return & Refund Tool'"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'ShopFlow - Product Search Tool'": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'ShopFlow - Order Tool'": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'ShopFlow - Customer Management'": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'ShopFlow - Support Ticket Tool'": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "NVIDIA Nemotron Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'ShopFlow - Support Tool'": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'ShopFlow - Cancel Order Tool'": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'ShopFlow - Return & Refund Tool'": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true
+  },
+  "versionId": "0b9ccfbb-c171-45de-8990-0eae452ec240",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f460ce2c83f8fd512345af835fc6254701eaba965e928cc57ea4e13c5b3a5538"
+  },
+  "nodeGroups": [],
+  "id": "rg2nYFgTfZnQutX8",
+  "tags": []
+}

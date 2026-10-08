@@ -1,0 +1,175 @@
+{
+  "name": "ShopFlow - Support Tool",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "order_id"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "d892943d-4110-4d27-9f91-0f1b3c332f8c",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1v6R2pcd992iZJGOHY06-1sawzMjmu8Q0gKrrVHMff0Y",
+          "mode": "list",
+          "cachedResultName": "ShopFlow Products",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1v6R2pcd992iZJGOHY06-1sawzMjmu8Q0gKrrVHMff0Y/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2057940777,
+          "mode": "list",
+          "cachedResultName": "Orders",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1v6R2pcd992iZJGOHY06-1sawzMjmu8Q0gKrrVHMff0Y/edit#gid=2057940777"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "order_id",
+              "lookupValue": "={{$json.order_id}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        0
+      ],
+      "id": "640e309c-7f47-43d2-9781-e6230a1d6e08",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xb68zIgoy3yMoBtm",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "00df7946-c3c3-4748-b08d-e12e824c3e71",
+              "name": "order_id",
+              "value": "={{$json.order_id}}",
+              "type": "string"
+            },
+            {
+              "id": "e4837a07-d31b-4f38-a0ca-0b9b6ac67c4f",
+              "name": "product_name",
+              "value": "={{$json.product_name}}",
+              "type": "string"
+            },
+            {
+              "id": "55eb44bc-e573-4bcf-85d4-667ff093108b",
+              "name": "quantity",
+              "value": "={{$json.quantity}}",
+              "type": "string"
+            },
+            {
+              "id": "ad6db911-fa50-42ae-85c6-577b283db28a",
+              "name": "total_amount",
+              "value": "={{$json.total_amount}}",
+              "type": "string"
+            },
+            {
+              "id": "3a8ce4d7-570f-49f2-9ff3-16625ecd2184",
+              "name": "status",
+              "value": "={{$json.status}}",
+              "type": "string"
+            },
+            {
+              "id": "fe0954bb-7739-406d-9287-32505d2845b3",
+              "name": "customer_name",
+              "value": "={{$json.customer_name}}",
+              "type": "string"
+            },
+            {
+              "id": "0a6f94ae-5462-4c91-9171-14351ba101ae",
+              "name": "delivery_status",
+              "value": "={{$json.delivery_status}}",
+              "type": "string"
+            },
+            {
+              "id": "4008c8e0-01f3-435e-bbe0-6aa8a18520ac",
+              "name": "estimated_delivery",
+              "value": "={{$json.estimated_delivery}}",
+              "type": "string"
+            },
+            {
+              "id": "df24afaf-b17b-4194-b256-1312ade6279b",
+              "name": "tracking_id",
+              "value": "={{$json.tracking_id}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        448,
+        0
+      ],
+      "id": "cf4c9a2d-6dd7-44db-9a2e-62b00a0e64e4",
+      "name": "Edit Fields"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true
+  },
+  "versionId": "a8088afe-f0d2-4226-bed0-66cb5c1e557c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f460ce2c83f8fd512345af835fc6254701eaba965e928cc57ea4e13c5b3a5538"
+  },
+  "nodeGroups": [],
+  "id": "oigvHIcggPXvLXJx",
+  "tags": []
+}

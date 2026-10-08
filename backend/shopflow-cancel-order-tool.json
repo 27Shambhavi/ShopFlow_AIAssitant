@@ -1,0 +1,650 @@
+{
+  "name": "ShopFlow - Cancel Order Tool",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "order_id"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "9c65217a-e5f1-4362-9133-6a772221bafe",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1v6R2pcd992iZJGOHY06-1sawzMjmu8Q0gKrrVHMff0Y",
+          "mode": "list",
+          "cachedResultName": "ShopFlow Products",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1v6R2pcd992iZJGOHY06-1sawzMjmu8Q0gKrrVHMff0Y/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2057940777,
+          "mode": "list",
+          "cachedResultName": "Orders",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1v6R2pcd992iZJGOHY06-1sawzMjmu8Q0gKrrVHMff0Y/edit#gid=2057940777"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "order_id",
+              "lookupValue": "={{$json.order_id}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        192,
+        0
+      ],
+      "id": "dda41a5e-57f5-4812-aa6f-867358a1ce11",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xb68zIgoy3yMoBtm",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "db4cbcbf-d05d-419d-8f89-0c09b11da431",
+              "leftValue": "={{$json.status}}",
+              "rightValue": "Confirmed",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        416,
+        0
+      ],
+      "id": "f9f38ea8-37ff-4b01-9906-d592d6defbca",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1v6R2pcd992iZJGOHY06-1sawzMjmu8Q0gKrrVHMff0Y",
+          "mode": "list",
+          "cachedResultName": "ShopFlow Products",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1v6R2pcd992iZJGOHY06-1sawzMjmu8Q0gKrrVHMff0Y/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2057940777,
+          "mode": "list",
+          "cachedResultName": "Orders",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1v6R2pcd992iZJGOHY06-1sawzMjmu8Q0gKrrVHMff0Y/edit#gid=2057940777"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "order_id": "={{$json.order_id}}",
+            "status": "Cancelled"
+          },
+          "matchingColumns": [
+            "order_id"
+          ],
+          "schema": [
+            {
+              "id": "order_id",
+              "displayName": "order_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "product_id",
+              "displayName": "product_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "product_name",
+              "displayName": "product_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "quantity",
+              "displayName": "quantity",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "unit_price",
+              "displayName": "unit_price",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "total_amount",
+              "displayName": "total_amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "customer_name",
+              "displayName": "customer_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "customer_email",
+              "displayName": "customer_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "delivery_status",
+              "displayName": "delivery_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "estimated_delivery",
+              "displayName": "estimated_delivery",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "tracking_id",
+              "displayName": "tracking_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        640,
+        -96
+      ],
+      "id": "12b3dec1-497e-4064-8acf-3293d91b1c33",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xb68zIgoy3yMoBtm",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fedddd3e-b341-4df0-b94a-b4c2c8e32d79",
+              "name": "success",
+              "value": "false",
+              "type": "string"
+            },
+            {
+              "id": "864982cc-7884-413d-8093-83cb4421a102",
+              "name": "message",
+              "value": "This order cannot be cancelled because it is already being processed or has progressed beyond the cancellation stage.",
+              "type": "string"
+            },
+            {
+              "id": "94c7939a-921f-4be0-9b80-574ee99f5d9a",
+              "name": "order_id",
+              "value": "={{$json.order_id}}",
+              "type": "string"
+            },
+            {
+              "id": "3ee8fa97-901c-405d-9f7e-bb264eda75d2",
+              "name": "status",
+              "value": "={{$json.status}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        640,
+        96
+      ],
+      "id": "8419dc74-7beb-4e8a-9497-174f2ce31f9d",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1v6R2pcd992iZJGOHY06-1sawzMjmu8Q0gKrrVHMff0Y",
+          "mode": "list",
+          "cachedResultName": "ShopFlow Products",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1v6R2pcd992iZJGOHY06-1sawzMjmu8Q0gKrrVHMff0Y/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1v6R2pcd992iZJGOHY06-1sawzMjmu8Q0gKrrVHMff0Y/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "product_id",
+              "lookupValue": "={{$node[\"Get row(s) in sheet\"].json.product_id}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        800,
+        -96
+      ],
+      "id": "7a45db1e-5f45-4d4f-9ce7-f01cd0f53cc3",
+      "name": "Get row(s) in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xb68zIgoy3yMoBtm",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "24d65539-ad77-4b1a-aaea-8768ba3e56c0",
+              "name": "product_id",
+              "value": "={{$json.product_id}}",
+              "type": "string"
+            },
+            {
+              "id": "9f08aaf8-f8bb-4e80-9f59-d382cae4b916",
+              "name": "new_stock",
+              "value": "={{ Number($json.stock) + Number($node[\"Get row(s) in sheet\"].json.quantity) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        960,
+        -96
+      ],
+      "id": "288c445b-d1ce-41e9-9090-73bd96041e30",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1v6R2pcd992iZJGOHY06-1sawzMjmu8Q0gKrrVHMff0Y",
+          "mode": "list",
+          "cachedResultName": "ShopFlow Products",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1v6R2pcd992iZJGOHY06-1sawzMjmu8Q0gKrrVHMff0Y/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1v6R2pcd992iZJGOHY06-1sawzMjmu8Q0gKrrVHMff0Y/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "stock": "=stock → {{$json.new_stock}}",
+            "product_id": "={{$json.product_id}}"
+          },
+          "matchingColumns": [
+            "product_id"
+          ],
+          "schema": [
+            {
+              "id": "product_id",
+              "displayName": "product_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "product_name",
+              "displayName": "product_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "price",
+              "displayName": "price",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "stock",
+              "displayName": "stock",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1120,
+        -96
+      ],
+      "id": "e8db1573-b227-4f13-8771-00517f6e33c7",
+      "name": "Update row in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xb68zIgoy3yMoBtm",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "593afb46-e70a-4124-9f05-1dcf2f1b40ee",
+              "name": "success",
+              "value": "true",
+              "type": "string"
+            },
+            {
+              "id": "7a450f51-53c2-4c3f-8151-953ee94d6e64",
+              "name": "order_id",
+              "value": "={{$node[\"When Executed by Another Workflow\"].json.order_id}}",
+              "type": "string"
+            },
+            {
+              "id": "a572691a-8da5-4fad-9d4e-4659f4b4825f",
+              "name": "status",
+              "value": "Cancelled",
+              "type": "string"
+            },
+            {
+              "id": "f7bd0d37-bb03-4a9c-a958-33e06fccc8cf",
+              "name": "message",
+              "value": "=Order {{$node[\"When Executed by Another Workflow\"].json.order_id}} has been successfully cancelled and the product stock has been restored.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1264,
+        -96
+      ],
+      "id": "c483c8ed-81f2-4cc0-afd9-12240796f727",
+      "name": "Edit Fields2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true
+  },
+  "versionId": "bfc89c88-3720-4615-9e5c-c96532439031",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f460ce2c83f8fd512345af835fc6254701eaba965e928cc57ea4e13c5b3a5538"
+  },
+  "nodeGroups": [],
+  "id": "Yy3UqHNMiXI9Zlhj",
+  "tags": []
+}

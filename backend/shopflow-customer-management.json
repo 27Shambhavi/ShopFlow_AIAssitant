@@ -1,0 +1,427 @@
+{
+  "name": "ShopFlow - Customer Management",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "customer_name"
+            },
+            {
+              "name": "customer_email"
+            },
+            {
+              "name": "order_id"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "b75e8029-3f51-46b5-8e79-61eb1c7c4fa7",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1v6R2pcd992iZJGOHY06-1sawzMjmu8Q0gKrrVHMff0Y",
+          "mode": "list",
+          "cachedResultName": "ShopFlow Products",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1v6R2pcd992iZJGOHY06-1sawzMjmu8Q0gKrrVHMff0Y/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 608130222,
+          "mode": "list",
+          "cachedResultName": "Customers",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1v6R2pcd992iZJGOHY06-1sawzMjmu8Q0gKrrVHMff0Y/edit#gid=608130222"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "customer_email",
+              "lookupValue": "={{$json.customer_email}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        0
+      ],
+      "id": "fbfcfd0f-aa96-4331-b66b-27f40d06e3e8",
+      "name": "Get row(s) in sheet",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xb68zIgoy3yMoBtm",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "10a90ec2-ed56-4607-bff5-4c131919effa",
+              "leftValue": "={{$json.customer_email}}",
+              "rightValue": "",
+              "operator": {
+                "type": "number",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        448,
+        0
+      ],
+      "id": "2055a6ad-bfc3-4881-961a-76b9bdd1f023",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "222d96b4-26ed-4bd3-a15b-fcb27c5a5080",
+              "name": "customer_id",
+              "value": "={{$json.customer_id}}",
+              "type": "string"
+            },
+            {
+              "id": "90155a6a-ea06-4d50-9fd8-9ab86fdcba0e",
+              "name": "customer_name",
+              "value": "={{$json.customer_name}}",
+              "type": "string"
+            },
+            {
+              "id": "eb6c5eab-72fb-4882-86ea-249b6da69a25",
+              "name": "customer_email",
+              "value": "={{$json.customer_email}}",
+              "type": "string"
+            },
+            {
+              "id": "8eaf34c9-bbd2-42f8-9c94-a1bac14fef06",
+              "name": "last_order_id",
+              "value": "={{$node[\"When Executed by Another Workflow\"].json[\"order_id\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "8438bc13-eb6f-463c-9eec-244228fa069c",
+              "name": "total_orders",
+              "value": "={{ Number($json.total_orders || 0) + 1 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        672,
+        -96
+      ],
+      "id": "175cb8c1-fe13-4bbf-93d9-678eb053d15f",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1v6R2pcd992iZJGOHY06-1sawzMjmu8Q0gKrrVHMff0Y",
+          "mode": "list",
+          "cachedResultName": "ShopFlow Products",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1v6R2pcd992iZJGOHY06-1sawzMjmu8Q0gKrrVHMff0Y/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 608130222,
+          "mode": "list",
+          "cachedResultName": "Customers",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1v6R2pcd992iZJGOHY06-1sawzMjmu8Q0gKrrVHMff0Y/edit#gid=608130222"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "customer_id": "={{$json.customer_id}}",
+            " customer_name ": "={{$json.customer_name}}",
+            "customer_email": "={{$json.customer_email}}",
+            "total_orders": "={{$json.total_orders}}",
+            "last_order_id": "={{$json.last_order_id}}"
+          },
+          "matchingColumns": [
+            "customer_id"
+          ],
+          "schema": [
+            {
+              "id": "customer_id",
+              "displayName": "customer_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": " customer_name ",
+              "displayName": " customer_name ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "customer_email",
+              "displayName": "customer_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "total_orders",
+              "displayName": "total_orders",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "last_order_id",
+              "displayName": "last_order_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        896,
+        -96
+      ],
+      "id": "9409da72-bbef-4aee-abab-8a00347b5120",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xb68zIgoy3yMoBtm",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1v6R2pcd992iZJGOHY06-1sawzMjmu8Q0gKrrVHMff0Y",
+          "mode": "list",
+          "cachedResultName": "ShopFlow Products",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1v6R2pcd992iZJGOHY06-1sawzMjmu8Q0gKrrVHMff0Y/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 608130222,
+          "mode": "list",
+          "cachedResultName": "Customers",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1v6R2pcd992iZJGOHY06-1sawzMjmu8Q0gKrrVHMff0Y/edit#gid=608130222"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "customer_id": "=CUS-{{$now.toMillis()}}",
+            "customer_email": "={{$json.customer_email}}",
+            " customer_name ": "={{$json.customer_name}}",
+            "total_orders": "1",
+            "last_order_id": "={{$json.order_id}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "customer_id",
+              "displayName": "customer_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": " customer_name ",
+              "displayName": " customer_name ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "customer_email",
+              "displayName": "customer_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "total_orders",
+              "displayName": "total_orders",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "last_order_id",
+              "displayName": "last_order_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        672,
+        96
+      ],
+      "id": "baa1a4f9-94ba-4d1b-be6e-08b724bf42bf",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xb68zIgoy3yMoBtm",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true
+  },
+  "versionId": "073d741f-0481-4fe7-919f-a08d75847a93",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f460ce2c83f8fd512345af835fc6254701eaba965e928cc57ea4e13c5b3a5538"
+  },
+  "nodeGroups": [],
+  "id": "lMcr4oMYlallDuod",
+  "tags": []
+}

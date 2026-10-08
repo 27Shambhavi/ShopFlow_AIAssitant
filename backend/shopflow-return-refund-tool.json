@@ -1,0 +1,456 @@
+{
+  "name": "ShopFlow - Return & Refund Tool",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "order_id"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "789de769-215b-4704-8dda-be0660d0abc6",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1v6R2pcd992iZJGOHY06-1sawzMjmu8Q0gKrrVHMff0Y",
+          "mode": "list",
+          "cachedResultName": "ShopFlow Products",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1v6R2pcd992iZJGOHY06-1sawzMjmu8Q0gKrrVHMff0Y/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2057940777,
+          "mode": "list",
+          "cachedResultName": "Orders",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1v6R2pcd992iZJGOHY06-1sawzMjmu8Q0gKrrVHMff0Y/edit#gid=2057940777"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "order_id",
+              "lookupValue": "={{$json.order_id}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        176,
+        0
+      ],
+      "id": "95f4adbf-be63-4fd6-a1fd-cd9b1832329b",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xb68zIgoy3yMoBtm",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "03fd2b70-9767-4761-9347-52e847387dd8",
+              "leftValue": "={{$json.status}}",
+              "rightValue": "Confirmed",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        352,
+        0
+      ],
+      "id": "75c0acf2-b6fc-4b1c-bef6-0d3d56b1ec87",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1v6R2pcd992iZJGOHY06-1sawzMjmu8Q0gKrrVHMff0Y",
+          "mode": "list",
+          "cachedResultName": "ShopFlow Products",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1v6R2pcd992iZJGOHY06-1sawzMjmu8Q0gKrrVHMff0Y/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2057940777,
+          "mode": "list",
+          "cachedResultName": "Orders",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1v6R2pcd992iZJGOHY06-1sawzMjmu8Q0gKrrVHMff0Y/edit#gid=2057940777"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "order_id": "={{$json.order_id}}",
+            "status": "Confirmed",
+            "return_status": "Return Requested",
+            "refund_status": "Pending"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "order_id",
+              "displayName": "order_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "product_id",
+              "displayName": "product_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "product_name",
+              "displayName": "product_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "quantity",
+              "displayName": "quantity",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "unit_price",
+              "displayName": "unit_price",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "total_amount",
+              "displayName": "total_amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "customer_name",
+              "displayName": "customer_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "customer_email",
+              "displayName": "customer_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "delivery_status",
+              "displayName": "delivery_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "estimated_delivery",
+              "displayName": "estimated_delivery",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "tracking_id",
+              "displayName": "tracking_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "return_status",
+              "displayName": "return_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "refund_status",
+              "displayName": "refund_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        576,
+        -96
+      ],
+      "id": "297187d5-9f02-443a-870b-9289a37ed3e4",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xb68zIgoy3yMoBtm",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "35203e0d-6712-4c48-be50-302d68e4e78e",
+              "name": "success",
+              "value": "false",
+              "type": "string"
+            },
+            {
+              "id": "6f91772a-45a1-468e-9cbb-06cc0b3b8dd2",
+              "name": "order_id",
+              "value": "={{$json.order_id}}",
+              "type": "string"
+            },
+            {
+              "id": "033e6ddb-3d90-4bd5-8bd1-ddadc06a8863",
+              "name": "return_status",
+              "value": "={{$json.return_status}}",
+              "type": "string"
+            },
+            {
+              "id": "eb45c711-6db9-4e75-beee-d7102f4b6c01",
+              "name": "refund_status",
+              "value": "={{$json.refund_status}}",
+              "type": "string"
+            },
+            {
+              "id": "03d84ee0-297c-4360-965a-74269a9ec95d",
+              "name": "message",
+              "value": "This order is not eligible for return because it has already been cancelled or has progressed beyond the return stage.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        576,
+        96
+      ],
+      "id": "ab05bc46-7ebc-4763-87f5-0b34fd2ddeba",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0042f3c5-c0bb-4571-9528-020402273c2f",
+              "name": "success",
+              "value": "true",
+              "type": "string"
+            },
+            {
+              "id": "91dd6d3c-286d-4fcc-b253-ba6fe835ac6e",
+              "name": "order_id",
+              "value": "={{$json.order_id}}",
+              "type": "string"
+            },
+            {
+              "id": "d119efa1-159b-47e5-b648-f2a01e8b5ed1",
+              "name": "return_status",
+              "value": "Return Requested",
+              "type": "string"
+            },
+            {
+              "id": "7fdf7e75-6eff-4fe8-8898-98bd56a23d19",
+              "name": "refund_status",
+              "value": "Pending",
+              "type": "string"
+            },
+            {
+              "id": "2da30d76-163f-4e71-ae34-346ef02afafe",
+              "name": "message",
+              "value": "Your return request has been successfully created. Your refund status is Pending.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        800,
+        -96
+      ],
+      "id": "4c0c2f05-5513-4709-89cf-4a22dc3a438d",
+      "name": "Edit Fields1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true
+  },
+  "versionId": "39eda2e9-b043-4ec9-8d14-d52f88440dd4",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f460ce2c83f8fd512345af835fc6254701eaba965e928cc57ea4e13c5b3a5538"
+  },
+  "nodeGroups": [],
+  "id": "heTepOElzCk7YjFh",
+  "tags": []
+}

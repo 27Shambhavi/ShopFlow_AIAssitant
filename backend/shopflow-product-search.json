@@ -1,0 +1,113 @@
+{
+  "name": "ShopFlow - Product Search Tool",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "search_query"
+            },
+            {
+              "name": "max_price",
+              "type": "number"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "32b0d613-e2d5-4f1b-b805-1b5e4653a771",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1v6R2pcd992iZJGOHY06-1sawzMjmu8Q0gKrrVHMff0Y",
+          "mode": "list",
+          "cachedResultName": "ShopFlow Products",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1v6R2pcd992iZJGOHY06-1sawzMjmu8Q0gKrrVHMff0Y/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1v6R2pcd992iZJGOHY06-1sawzMjmu8Q0gKrrVHMff0Y/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        0
+      ],
+      "id": "0a320bdf-8edf-41d0-b988-27c2bd6f98fc",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xb68zIgoy3yMoBtm",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const searchQuery = $(\"When Executed by Another Workflow\")\n  .first()\n  .json\n  .search_query\n  ?.toLowerCase()\n  .trim();\n\nconst maxPrice = Number(\n  $(\"When Executed by Another Workflow\")\n    .first()\n    .json\n    .max_price\n);\n\nconst products = $input.all();\n\nconst results = products.filter(item => {\n  const p = item.json;\n\n  const text = [\n    p.product_name,\n    p.category,\n    p.description\n  ]\n    .filter(Boolean)\n    .join(\" \")\n    .toLowerCase();\n\n  const matchesSearch =\n    !searchQuery || text.includes(searchQuery);\n\n  const matchesPrice =\n    !maxPrice || Number(p.price) <= maxPrice;\n\n  return matchesSearch && matchesPrice;\n});\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        0
+      ],
+      "id": "1f1c546c-4c4b-4a67-9e4c-209cad802879",
+      "name": "Code in JavaScript"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true
+  },
+  "versionId": "29b89ade-94f0-4e2a-8c48-f666a4b30b43",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f460ce2c83f8fd512345af835fc6254701eaba965e928cc57ea4e13c5b3a5538"
+  },
+  "nodeGroups": [],
+  "id": "gZ69m20UYOb0gGiG",
+  "tags": []
+}

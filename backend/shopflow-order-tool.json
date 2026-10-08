@@ -1,0 +1,623 @@
+{
+  "name": "ShopFlow - Order Tool",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "product_id"
+            },
+            {
+              "name": "quantity",
+              "type": "number"
+            },
+            {
+              "name": "customer_name"
+            },
+            {
+              "name": "customer_email"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "542c0f65-b4ed-4db0-8762-d8f62f21c41c",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1v6R2pcd992iZJGOHY06-1sawzMjmu8Q0gKrrVHMff0Y",
+          "mode": "list",
+          "cachedResultName": "ShopFlow Products",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1v6R2pcd992iZJGOHY06-1sawzMjmu8Q0gKrrVHMff0Y/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1v6R2pcd992iZJGOHY06-1sawzMjmu8Q0gKrrVHMff0Y/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": []
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        0
+      ],
+      "id": "5a58b170-b72d-4960-9efd-fb35f8f5251a",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xb68zIgoy3yMoBtm",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $(\"When Executed by Another Workflow\").first().json;\n\nconst productId = input.product_id;\nconst requestedQuantity = Number(input.quantity);\n\nconst products = $input.all();\n\nconst product = products.find(\n  item => item.json.product_id === productId\n);\n\nif (!product) {\n  return [{\n    json: {\n      success: false,\n      status: \"PRODUCT_NOT_FOUND\",\n      message: `Product ${productId} was not found.`\n    }\n  }];\n}\n\nconst stock = Number(product.json.stock);\n\nif (requestedQuantity <= 0) {\n  return [{\n    json: {\n      success: false,\n      status: \"INVALID_QUANTITY\",\n      message: \"Quantity must be greater than 0.\"\n    }\n  }];\n}\n\nif (requestedQuantity > stock) {\n  return [{\n    json: {\n      success: false,\n      status: \"INSUFFICIENT_STOCK\",\n      product_id: productId,\n      product_name: product.json.product_name,\n      requested_quantity: requestedQuantity,\n      available_stock: stock,\n      message: `Only ${stock} units are available.`\n    }\n  }];\n}\n\nreturn [{\n  json: {\n    success: true,\n    status: \"STOCK_AVAILABLE\",\n    product_id: productId,\n    product_name: product.json.product_name,\n    price: Number(product.json.price),\n    requested_quantity: requestedQuantity,\n    available_stock: stock,\n    customer_name: input.customer_name,\n    customer_email: input.customer_email\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        0
+      ],
+      "id": "36a41e7a-707d-4b24-be68-d1bc9ab2bebc",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "5a644168-1059-4a5c-8c6f-63429ed907a8",
+              "leftValue": "={{ $json.success }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        672,
+        0
+      ],
+      "id": "8fb6b58c-acda-4530-91c8-20ed4002a46f",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1v6R2pcd992iZJGOHY06-1sawzMjmu8Q0gKrrVHMff0Y",
+          "mode": "list",
+          "cachedResultName": "ShopFlow Products",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1v6R2pcd992iZJGOHY06-1sawzMjmu8Q0gKrrVHMff0Y/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2057940777,
+          "mode": "list",
+          "cachedResultName": "Sheet2",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1v6R2pcd992iZJGOHY06-1sawzMjmu8Q0gKrrVHMff0Y/edit#gid=2057940777"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "order_id": "={{ $json.order_id }}",
+            "product_id": "={{ $json.product_id }}",
+            "product_name": "={{ $json.product_name }}",
+            "quantity": "={{ $json.quantity }}",
+            "unit_price": "={{ $json.unit_price }}",
+            "total_amount": "={{ $json.total_amount }}",
+            "customer_name": "={{ $json.customer_name }}",
+            "customer_email": "={{ $json.customer_email }}",
+            "status": "={{ $json.status }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "order_id",
+              "displayName": "order_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "product_id",
+              "displayName": "product_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "product_name",
+              "displayName": "product_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "quantity",
+              "displayName": "quantity",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "unit_price",
+              "displayName": "unit_price",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "total_amount",
+              "displayName": "total_amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "customer_name",
+              "displayName": "customer_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "customer_email",
+              "displayName": "customer_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        976,
+        -96
+      ],
+      "id": "431c53da-6936-4ebd-9228-0079f4980aef",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xb68zIgoy3yMoBtm",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8c9fe173-96c8-4cb1-9193-795a96b7d2f9",
+              "name": "success",
+              "value": "false",
+              "type": "string"
+            },
+            {
+              "id": "04b705c8-3bac-4c64-9100-5e0e51de5a70",
+              "name": "message",
+              "value": "={{$json.message}}",
+              "type": "string"
+            },
+            {
+              "id": "32e78a9b-0e03-4d82-be02-3b37776691cd",
+              "name": "status",
+              "value": "={{$json.status}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        912,
+        112
+      ],
+      "id": "f7b9f61e-622c-4f1d-82da-cdbf51e49046",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\n\nconst orderId = `ORD-${Date.now()}`;\n\nconst quantity = Number(data.requested_quantity);\nconst unitPrice = Number(data.price);\n\nreturn [{\n  json: {\n    order_id: orderId,\n    product_id: data.product_id,\n    product_name: data.product_name,\n    quantity: quantity,\n    unit_price: unitPrice,\n    total_amount: quantity * unitPrice,\n    customer_name: data.customer_name,\n    customer_email: data.customer_email,\n    status: \"Confirmed\",\n    new_stock: Number(data.stock) - quantity\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        816,
+        -176
+      ],
+      "id": "ab2c216e-4f71-447d-86ae-9dddfcd9ec6d",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1v6R2pcd992iZJGOHY06-1sawzMjmu8Q0gKrrVHMff0Y",
+          "mode": "list",
+          "cachedResultName": "ShopFlow Products",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1v6R2pcd992iZJGOHY06-1sawzMjmu8Q0gKrrVHMff0Y/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1v6R2pcd992iZJGOHY06-1sawzMjmu8Q0gKrrVHMff0Y/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "stock": "={{ $json.new_stock }}",
+            "product_id": "{{ $json.product_id }}"
+          },
+          "matchingColumns": [
+            "product_id"
+          ],
+          "schema": [
+            {
+              "id": "product_id",
+              "displayName": "product_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "product_name",
+              "displayName": "product_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "price",
+              "displayName": "price",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "stock",
+              "displayName": "stock",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        976,
+        -272
+      ],
+      "id": "1aa8be9c-3891-478c-a007-96de1b39e352",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xb68zIgoy3yMoBtm",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Code in JavaScript1').item.json.customer_email }}",
+        "subject": "=ShopFlow Order Confirmation - {{ $('Code in JavaScript1').item.json.order_id }}",
+        "message": "=<h2>Order Confirmed! 🎉</h2>\n\n<p>Hi {{ $('Code in JavaScript1').item.json.customer_name }},</p>\n\n<p>Your ShopFlow order has been successfully placed.</p>\n\n<p>\n<strong>Order ID:</strong> {{ $('Code in JavaScript1').item.json.order_id }}<br>\n<strong>Product:</strong> {{ $('Code in JavaScript1').item.json.product_name }}<br>\n<strong>Quantity:</strong> {{ $('Code in JavaScript1').item.json.quantity }}<br>\n<strong>Total Amount:</strong> ₹{{ $('Code in JavaScript1').item.json.total_amount }}<br>\n<strong>Status:</strong> {{ $('Code in JavaScript1').item.json.status }}\n</p>\n\n<p>Thank you for shopping with ShopFlow AI!</p>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1408,
+        -96
+      ],
+      "id": "8b572cf5-c45f-4cc4-b448-c104223d8ecb",
+      "name": "Send a message",
+      "webhookId": "86ef8644-3c18-46ca-b624-29ed39c3c3b9",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "AJzyS8k97pbkspVv",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "lMcr4oMYlallDuod",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/lMcr4oMYlallDuod",
+          "cachedResultName": "ShopFlow - Customer Management"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "customer_name": "={{$json.customer_name}}",
+            "customer_email": "={{$json.customer_email}}",
+            "order_id": "={{$json.order_id}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "customer_name",
+              "displayName": "customer_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "customer_email",
+              "displayName": "customer_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "order_id",
+              "displayName": "order_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1200,
+        -96
+      ],
+      "id": "4a711fff-e4f2-40fd-9ca8-fa9bcf3a3eb0",
+      "name": "Call 'ShopFlow - Customer Management'"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Call 'ShopFlow - Customer Management'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet": {
+      "main": [
+        []
+      ]
+    },
+    "Call 'ShopFlow - Customer Management'": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true
+  },
+  "versionId": "7fcc9b9f-49bf-451e-b1ea-06d40712c97d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f460ce2c83f8fd512345af835fc6254701eaba965e928cc57ea4e13c5b3a5538"
+  },
+  "nodeGroups": [],
+  "id": "2cx29S5vQq7fpqMp",
+  "tags": []
+}
